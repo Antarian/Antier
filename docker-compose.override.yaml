@@ -1,0 +1,11 @@
+# secondary overriding docker compose file
+version: '3.2'
+services:
+  antier:
+    ports:
+      - "8080:8000"
+    volumes:
+      - type: bind
+        source: ./
+        target: /usr/src/antier
+
