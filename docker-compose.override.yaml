@@ -6,7 +6,7 @@ services:
       context: ./
       dockerfile: ./Dockerfiles/dev/Dockerfile
     ports:
-      - "8080:8000"
+      - "8080:8080"
     volumes:
       - type: bind
         source: ./
