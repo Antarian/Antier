@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Class BlogPostController
  * @package App\Controller
  *
- * @Route("/blog")
+ * @Route("/blog", defaults={"_format": "json"})
  */
 class BlogPostController extends Controller
 {
@@ -34,7 +34,7 @@ class BlogPostController extends Controller
      *
      * @return Response
      */
-    public function getPostAction($slug)
+    public function getBlogPostAction($slug)
     {
         return new Response($slug);
     }
@@ -45,7 +45,7 @@ class BlogPostController extends Controller
      * @param Request $request
      * @return Response
      */
-    public function postPostAction(Request $request)
+    public function postBlogPostAction(Request $request)
     {
         $data = $request->request->all();
         $post = $this->serializer->deserialize($data, BlogPostModel::class, 'json');
@@ -65,7 +65,7 @@ class BlogPostController extends Controller
      *
      * @param $slug
      */
-    public function putPostAction($slug)
+    public function putBlogPostAction($slug)
     {
 
     }
