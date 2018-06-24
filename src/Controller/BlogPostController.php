@@ -15,12 +15,20 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  *
  * @Route("/blog", defaults={"_format": "json"})
  */
-class BlogPostController extends Controller
+class BlogPostController extends Controller implements PublicApiInterface
 {
+    /** @var ValidatorInterface */
     protected $validator;
 
+    /** @var SerializerInterface */
     protected $serializer;
 
+    /**
+     * BlogPostController constructor.
+     *
+     * @param ValidatorInterface $validator
+     * @param SerializerInterface $serializer
+     */
     public function __construct(ValidatorInterface $validator, SerializerInterface $serializer)
     {
         $this->validator = $validator;
@@ -28,28 +36,20 @@ class BlogPostController extends Controller
     }
 
     /**
-     * @Route("/post/{slug}", methods={"GET"}, name="read_blog_post")
+     * @Route("/post/{id}", methods={"GET"}, name="read_blog_post")
      *
-     * @param $slug
+     * @param $id
      *
      * @return Response
      */
-    public function getBlogPostAction($slug)
+    public function getBlogPostAction($id)
     {
-        return new Response($slug);
-    }
+        $blogPost = new BlogPostModel();
+        $blogPost->setId($id);
+        $blogPost->setSlug('slug');
+        $blogPost->setTitle('title');
 
-    /**
-     * @Route("/post", methods={"POST"}, name="create_blog_post")
-     *
-     * @param Request $request
-     * @return Response
-     */
-    public function postBlogPostAction(Request $request)
-    {
-        $data = $request->request->all();
-        $post = $this->serializer->deserialize($data, BlogPostModel::class, 'json');
-        $errors = $this->validator->validate($post);
+        $errors = $this->validator->validate($blogPost);
 
         if (count($errors) > 0) {
             $errorsString = (string) $errors;
@@ -57,16 +57,60 @@ class BlogPostController extends Controller
             return new Response($errorsString);
         }
 
-        return new Response($post);
+        $blogPostJson = $this->serializer->serialize($blogPost, 'json');
+        return new Response($blogPostJson);
     }
 
     /**
-     * @Route("/post/{slug}", methods={"PUT"}, name="update_blog_post")
+     * @Route("/post", methods={"POST"}, name="create_blog_post")
      *
-     * @param $slug
+     * @param Request $request
+     *
+     * @return Response
      */
-    public function putBlogPostAction($slug)
+    public function postBlogPostAction(Request $request)
     {
+        $content = $request->getContent();
+        /** @var BlogPostModel $blogPost */
+        $blogPost = $this->serializer->deserialize($content, BlogPostModel::class, 'json');
+        $errors = $this->validator->validate($blogPost);
 
+        if (count($errors) > 0) {
+            $errorsString = (string) $errors;
+
+            return new Response($errorsString);
+        }
+
+        $blogPost->setId("abc123");
+
+        $blogPostJson = $this->serializer->serialize($blogPost, 'json');
+        return new Response($blogPostJson);
+    }
+
+    /**
+     * @Route("/post/{id}", methods={"PUT"}, name="update_blog_post")
+     *
+     * @param string $id
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function putBlogPostAction(Request $request, $id)
+    {
+        $content = $request->getContent();
+        /** @var BlogPostModel $blogPost */
+        $blogPost = $this->serializer->deserialize($content, BlogPostModel::class, 'json');
+        $errors = $this->validator->validate($blogPost);
+
+        if (count($errors) > 0) {
+            $errorsString = (string) $errors;
+
+            return new Response($errorsString);
+        }
+
+        $blogPost->setId($id);
+
+        $blogPostJson = $this->serializer->serialize($blogPost, 'json');
+        return new Response($blogPostJson);
     }
 }

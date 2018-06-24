@@ -2,6 +2,8 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'en'
+    requiredHeaders:
+        accept: 'application/json'
 
 services:
     # default configuration for services in *this* file
@@ -24,5 +26,18 @@ services:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
 
+    App\EventSubscriber\ApiHeadersChecker:
+        arguments:
+            $requiredHeaders: '%requiredHeaders%'
+
+    Symfony\Component\Serializer\Serializer:
+        arguments:
+            $normalizers:
+                - Symfony\Component\Serializer\Normalizer\ObjectNormalizer
+            $encoders:
+                - Symfony\Component\Serializer\Encoder\JsonEncoder
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    sensio_framework_extra.view.listener:
+        alias: Sensio\Bundle\FrameworkExtraBundle\EventListener\TemplateListener
