@@ -10,6 +10,8 @@ RUN apt-get update && \
         libzip-dev \
         zip \
         vim \
+        libssl-dev \
+    && rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-configure zip --with-libzip \
     && docker-php-ext-install zip \
     && docker-php-ext-install pcntl \
@@ -31,3 +33,5 @@ RUN curl -s https://getcomposer.org/installer | php && \
     mv composer.phar /usr/local/bin/composer
 RUN . ~/.bashrc
 
+RUN pecl install mongodb-1.4.4 \
+    && docker-php-ext-enable mongodb

@@ -2,8 +2,12 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'en'
-    requiredHeaders:
-        accept: 'application/json'
+    headers:
+        post:
+            accept: 'application/json'
+            content-type: 'application/json'
+        get:
+            accept: 'application/json'
 
 services:
     # default configuration for services in *this* file
@@ -28,7 +32,7 @@ services:
 
     App\EventSubscriber\ApiHeadersChecker:
         arguments:
-            $requiredHeaders: '%requiredHeaders%'
+            $headers: '%headers%'
 
     Symfony\Component\Serializer\Serializer:
         arguments:

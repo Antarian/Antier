@@ -23,6 +23,9 @@
     "doctrine/lexer": {
         "version": "v1.0.1"
     },
+    "mongodb/mongodb": {
+        "version": "1.3.2"
+    },
     "paragonie/random_compat": {
         "version": "v2.0.15"
     },

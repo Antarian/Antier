@@ -35,7 +35,7 @@ class BlogPostControllerTest extends WebTestCase
                     'slug' => 'abc123',
                     'title' => 'Abc 123',
                 ]),
-                'expected' => '{"id":"abc123","slug":"abc123","title":"Abc 123","content":null}',
+                'expected' => '{"oid":"abc123","slug":"abc123","title":"Abc 123","content":null}',
             ],
         ];
     }
@@ -53,7 +53,7 @@ class BlogPostControllerTest extends WebTestCase
 
         $jsonArr = json_decode($client->getResponse()->getContent(), true);
 
-        $this->assertEquals($input, $jsonArr['id']);
+        $this->assertEquals($input, $jsonArr['oid']);
         $this->assertArrayHasKey('slug', $jsonArr);
         $this->assertArrayHasKey('title', $jsonArr);
     }

@@ -10,11 +10,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ApiHeadersChecker implements EventSubscriberInterface
 {
-    private $requiredHeaders;
+    private $headers;
 
-    public function __construct($requiredHeaders)
+    public function __construct($headers)
     {
-        $this->requiredHeaders = $requiredHeaders;
+        $this->headers = $headers;
     }
 
     public function onKernelController(FilterControllerEvent $event)
@@ -31,7 +31,10 @@ class ApiHeadersChecker implements EventSubscriberInterface
         }
 
         if ($controller[0] instanceof PublicApiInterface) {
-            $this->checkRequiredHeaders($event->getRequest()->headers);
+            $this->checkHeaders(
+                $event->getRequest()->headers,
+                strtolower($event->getRequest()->getMethod())
+            );
         }
     }
 
@@ -42,9 +45,15 @@ class ApiHeadersChecker implements EventSubscriberInterface
         );
     }
 
-    protected function checkRequiredHeaders(HeaderBag $requestHeaders)
+    /**
+     * @param HeaderBag $requestHeaders
+     * @param string $requestMethod
+     *
+     * @throws AccessDeniedHttpException
+     */
+    protected function checkHeaders(HeaderBag $requestHeaders, string $requestMethod)
     {
-        foreach ($this->requiredHeaders as $headerName => $headerValues) {
+        foreach ($this->headers[$requestMethod] as $headerName => $headerValues) {
             $headerValues = is_array($headerValues) ? $headerValues : [$headerValues];
             foreach ($headerValues as $headerValue) {
                 if (!$requestHeaders->contains($headerName, $headerValue)) {

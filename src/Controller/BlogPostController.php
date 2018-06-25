@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Model\BlogPostModel;
+use App\Service\MongoService;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,16 +24,19 @@ class BlogPostController extends Controller implements PublicApiInterface
     /** @var SerializerInterface */
     protected $serializer;
 
+    protected $service;
+
     /**
      * BlogPostController constructor.
      *
      * @param ValidatorInterface $validator
      * @param SerializerInterface $serializer
      */
-    public function __construct(ValidatorInterface $validator, SerializerInterface $serializer)
+    public function __construct(ValidatorInterface $validator, SerializerInterface $serializer, MongoService $service)
     {
         $this->validator = $validator;
         $this->serializer = $serializer;
+        $this->service = $service;
     }
 
     /**
@@ -45,7 +49,7 @@ class BlogPostController extends Controller implements PublicApiInterface
     public function getBlogPostAction($id)
     {
         $blogPost = new BlogPostModel();
-        $blogPost->setId($id);
+        $blogPost->setOid($id);
         $blogPost->setSlug('slug');
         $blogPost->setTitle('title');
 
@@ -81,9 +85,10 @@ class BlogPostController extends Controller implements PublicApiInterface
             return new Response($errorsString);
         }
 
-        $blogPost->setId("abc123");
+        $oid = $this->service->insertDocument($blogPost);
+        $blogPostObj = $this->service->findDocument($oid);
 
-        $blogPostJson = $this->serializer->serialize($blogPost, 'json');
+        $blogPostJson = $this->serializer->serialize($blogPostObj, 'json');
         return new Response($blogPostJson);
     }
 
@@ -95,7 +100,7 @@ class BlogPostController extends Controller implements PublicApiInterface
      *
      * @return Response
      */
-    public function putBlogPostAction(Request $request, $id)
+    public function putBlogPostAction(Request $request, $oid)
     {
         $content = $request->getContent();
         /** @var BlogPostModel $blogPost */
@@ -108,7 +113,7 @@ class BlogPostController extends Controller implements PublicApiInterface
             return new Response($errorsString);
         }
 
-        $blogPost->setId($id);
+        $blogPost->setOid($oid);
 
         $blogPostJson = $this->serializer->serialize($blogPost, 'json');
         return new Response($blogPostJson);

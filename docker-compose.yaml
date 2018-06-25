@@ -1,13 +1,24 @@
 # main docker compose file
 version: '3.2'
 services:
-  antier:
-    build:
-      context: ./
-      dockerfile: ./Dockerfiles/prod/Dockerfile
-    tty: true
-    volumes:
-      - type: volume
-        source: ./
-        target: /usr/src/antier
-
+    antier:
+        build:
+            context: ./
+            dockerfile: ./Dockerfiles/prod/Dockerfile
+        tty: true
+        volumes:
+            - type: volume
+              source: ./
+              target: /usr/src/antier
+        depends_on:
+            - antierdata
+#        ports:
+#            - "8080:443"
+    antierdata:
+        image: mongo:3.6
+#        restart: always
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=antieruser
+            - MONGO_INITDB_ROOT_PASSWORD=antierpass
+        ports:
+            - "27018:27018"

@@ -1,17 +1,17 @@
 <?php
 namespace App\Model;
 
+use MongoDB\BSON\Unserializable;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class BlogPostModel
+class BlogPostModel implements Unserializable
 {
     /**
      * @var string
      *
      * @Assert\Type(type="string")
-     * @Assert\Uuid
      */
-    protected $id;
+    protected $oid;
 
     /**
      * @var string
@@ -39,17 +39,17 @@ class BlogPostModel
     /**
      * @return string
      */
-    public function getId(): string
+    public function getOid(): string
     {
-        return $this->id;
+        return $this->oid;
     }
 
     /**
-     * @param string $id
+     * @param string $oid
      */
-    public function setId(string $id)
+    public function setOid(string $oid)
     {
-        $this->id = $id;
+        $this->oid = $oid;
     }
 
     /**
@@ -98,5 +98,18 @@ class BlogPostModel
     public function setContent(array $content)
     {
         $this->content = $content;
+    }
+
+    /**
+     * @todo symfony serializer to/from bson
+     *
+     * @param array $data
+     */
+    public function bsonUnserialize(array $data)
+    {
+        foreach ( $data as $k => $value )
+        {
+            $this->$k = $value;
+        }
     }
 }
