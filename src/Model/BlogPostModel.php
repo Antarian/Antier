@@ -1,17 +1,20 @@
 <?php
 namespace App\Model;
 
-use MongoDB\BSON\Unserializable;
+use DateTime;
+use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\Persistable;
+use MongoDB\BSON\UTCDateTime;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class BlogPostModel implements Unserializable
+class BlogPostModel implements Persistable
 {
     /**
      * @var string
      *
      * @Assert\Type(type="string")
      */
-    protected $oid;
+    protected $id;
 
     /**
      * @var string
@@ -37,25 +40,67 @@ class BlogPostModel implements Unserializable
     protected $content;
 
     /**
-     * @return string
+     * @var DateTime
+     *
+     * @Assert\Type(type="\DateTime")
      */
-    public function getOid(): string
+    protected $createdAt;
+
+    public function __construct()
     {
-        return $this->oid;
+        $this->setCreatedAt($this->getDateTime());
+    }
+
+
+    public function bsonSerialize()
+    {
+        $miliseconds = $this->getCreatedAt()->getTimestamp() * 1000;
+
+        return [
+            '_id' => new ObjectId($this->getId()),
+            'slug' => $this->getSlug(),
+            'title' => $this->getTitle(),
+            'content' => $this->getContent(),
+            'createdAt' => new UTCDateTime($miliseconds),
+        ];
+    }
+
+
+    public function bsonUnserialize(array $data)
+    {
+        /** @var ObjectId $oid */
+        $oid = $data['_id'];
+
+        /** @var UTCDateTime $createdAt */
+        $createdAt = $data['createdAt'];
+
+        $this->setId($oid->__toString());
+        $this->setSlug($data['slug']);
+        $this->setTitle($data['title']);
+        $this->setContent($data['content']);
+        $this->setCreatedAt($createdAt->toDateTime());
     }
 
     /**
-     * @param string $oid
+     * @return string
      */
-    public function setOid(string $oid)
+    public function getId()
     {
-        $this->oid = $oid;
+        return $this->id;
+    }
+
+    /**
+     * @param string $id
+     */
+    public function setId(string $id)
+    {
+        $this->id = $id;
     }
 
     /**
      * @return string
      */
-    public function getSlug(): string
+    public function getSlug()
     {
         return $this->slug;
     }
@@ -71,7 +116,7 @@ class BlogPostModel implements Unserializable
     /**
      * @return string
      */
-    public function getTitle(): string
+    public function getTitle()
     {
         return $this->title;
     }
@@ -95,21 +140,29 @@ class BlogPostModel implements Unserializable
     /**
      * @param BlogContentModel[] $content
      */
-    public function setContent(array $content)
+    public function setContent(array $content = null)
     {
         $this->content = $content;
     }
 
     /**
-     * @todo symfony serializer to/from bson
-     *
-     * @param array $data
+     * @return DateTime
      */
-    public function bsonUnserialize(array $data)
+    public function getCreatedAt()
     {
-        foreach ( $data as $k => $value )
-        {
-            $this->$k = $value;
-        }
+        return $this->createdAt;
+    }
+
+    /**
+     * @param DateTime $createdAt
+     */
+    public function setCreatedAt(DateTime $createdAt)
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    protected function getDateTime()
+    {
+        return new DateTime();
     }
 }

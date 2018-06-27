@@ -18,20 +18,16 @@ class MongoService
     {
         $collection = (new Client('mongodb://antieruser:antierpass@antierdata/'))->antierdb->blogs;
 
-        $insertOneResult = $collection->insertOne([
-            'username' => 'admin',
-            'email' => 'admin@example.com',
-            'name' => 'Admin User',
-        ]);
+        $insertOneResult = $collection->insertOne($document);
 
         return $insertOneResult->getInsertedId();
     }
 
-    public function findDocument($oid)
+    public function findDocument($id)
     {
         $collection = (new Client('mongodb://antieruser:antierpass@antierdata/'))->antierdb->blogs;
 
-        $findOneResult = $collection->findOne(['_id' => new ObjectId($oid)]);
+        $findOneResult = $collection->findOne(['_id' => new ObjectId($id)]);
 
         return $findOneResult;
     }

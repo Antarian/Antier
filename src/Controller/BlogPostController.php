@@ -49,7 +49,7 @@ class BlogPostController extends Controller implements PublicApiInterface
     public function getBlogPostAction($id)
     {
         $blogPost = new BlogPostModel();
-        $blogPost->setOid($id);
+        $blogPost->setId($id);
         $blogPost->setSlug('slug');
         $blogPost->setTitle('title');
 
@@ -113,7 +113,7 @@ class BlogPostController extends Controller implements PublicApiInterface
             return new Response($errorsString);
         }
 
-        $blogPost->setOid($oid);
+        $blogPost->setId($oid);
 
         $blogPostJson = $this->serializer->serialize($blogPost, 'json');
         return new Response($blogPostJson);
