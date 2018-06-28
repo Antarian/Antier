@@ -57,7 +57,6 @@ class BlogPostControllerTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
         $jsonArr = json_decode($client->getResponse()->getContent(), true);
-
         $this->assertEquals($input, $jsonArr['id']);
         $this->assertArrayHasKey('slug', $jsonArr);
         $this->assertArrayHasKey('title', $jsonArr);

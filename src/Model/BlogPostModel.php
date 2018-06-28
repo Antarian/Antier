@@ -48,20 +48,17 @@ class BlogPostModel implements Persistable
 
     public function __construct()
     {
-        $this->setCreatedAt($this->getDateTime());
     }
 
 
     public function bsonSerialize()
     {
-        $miliseconds = $this->getCreatedAt()->getTimestamp() * 1000;
-
         return [
             '_id' => new ObjectId($this->getId()),
             'slug' => $this->getSlug(),
             'title' => $this->getTitle(),
             'content' => $this->getContent(),
-            'createdAt' => new UTCDateTime($miliseconds),
+            'createdAt' => new UTCDateTime($this->getCreatedAt()),
         ];
     }
 

@@ -1,0 +1,19 @@
+security:
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    providers:
+        mongodb_provider:
+            id: App\Security\UserProvider
+    firewalls:
+        main:
+            anonymous: true
+            json_login:
+                check_path: login
+
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+         - { path: ^/api/, roles: ROLE_ADMIN }
+
+    encoders:
+        App\Model\UserModel:
+            algorithm: bcrypt
+            cost: 15
