@@ -1,5 +1,5 @@
 # development docker file
-FROM php:7.1-cli
+FROM php:7.1.19-cli
 
 LABEL antarian-dockerfile=Antier
 
@@ -33,5 +33,5 @@ RUN curl -s https://getcomposer.org/installer | php && \
     mv composer.phar /usr/local/bin/composer
 RUN . ~/.bashrc
 
-RUN pecl install mongodb-1.4.4 \
+RUN pecl install mongodb-1.5.0 \
     && docker-php-ext-enable mongodb

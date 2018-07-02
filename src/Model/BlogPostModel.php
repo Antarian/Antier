@@ -48,6 +48,7 @@ class BlogPostModel implements Persistable
 
     public function __construct()
     {
+        $this->setCreatedAt(new DateTime());
     }
 
 

@@ -85,8 +85,8 @@ class BlogPostController extends Controller implements PublicApiInterface
             return new Response($errorsString);
         }
 
-        $oid = $this->service->insertDocument($blogPost);
-        $blogPostObj = $this->service->findDocument($oid);
+        $oid = $this->service->insertBlogPost($blogPost);
+        $blogPostObj = $this->service->findBlogPostBySlug($blogPost->getSlug());
 
         $blogPostJson = $this->serializer->serialize($blogPostObj, 'json');
         return new Response($blogPostJson);

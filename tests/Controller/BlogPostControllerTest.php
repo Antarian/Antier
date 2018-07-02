@@ -5,9 +5,8 @@ use App\Model\BlogPostModel;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class BlogPostControllerTest extends WebTestCase
+class BlogPostControllerTest extends ApiTestCase
 {
 
     /**
@@ -74,36 +73,5 @@ class BlogPostControllerTest extends WebTestCase
                 'input' => $uuid->toString(),
             ],
         ];
-    }
-
-    /*** HELPERS ***/
-
-    /**
-     * @param string $method
-     * @param string|null $uri
-     * @param string|null $postData
-     *
-     * @return \Symfony\Bundle\FrameworkBundle\Client
-     */
-    protected function prepareClient(string $method = 'GET', string $uri = null, string $postData = null): Client
-    {
-        $client = static::createClient();
-
-        $headers = [];
-        $headers['HTTP_ACCEPT'] = 'application/json';
-        if (in_array($method, ['POST', 'PUT'])) {
-            $headers['CONTENT_TYPE'] = 'application/json';
-        }
-
-        $client->request(
-            $method,
-            $uri,
-            [],
-            [],
-            $headers,
-            $postData
-        );
-
-        return $client;
     }
 }

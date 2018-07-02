@@ -2,6 +2,7 @@
 namespace App\Security;
 
 use App\Model\UserModel;
+use App\Service\MongoService;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -9,9 +10,16 @@ use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 
 class UserProvider implements UserProviderInterface
 {
+    protected $service;
+
+    public function __construct(MongoService $service)
+    {
+        $this->service = $service;
+    }
+
     public function loadUserByUsername($username)
     {
-        $userModel = '';
+        $userModel = $this->service->findUserByUsername($username);
 
         if ($userModel) {
             return $userModel;
