@@ -37,7 +37,9 @@ services:
     Symfony\Component\Serializer\Serializer:
         arguments:
             $normalizers:
-                - Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer
+#                - Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer
+                - Symfony\Component\Serializer\Normalizer\ObjectNormalizer
+                - Symfony\Component\Serializer\Normalizer\ArrayDenormalizer
             $encoders:
                 - Symfony\Component\Serializer\Encoder\JsonEncoder
 

@@ -1,6 +1,7 @@
 <?php
 namespace App\Model;
 
+use ArrayObject;
 use DateTime;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\Persistable;
@@ -33,7 +34,7 @@ class BlogPostModel implements Persistable
     protected $title;
 
     /**
-     * @var BlogContentModel[]
+     * @var BlogTextModel[]
      *
      * @Assert\Valid()
      */
@@ -48,6 +49,7 @@ class BlogPostModel implements Persistable
 
     public function __construct()
     {
+        //$this->content = [];
         $this->setCreatedAt(new DateTime());
     }
 
@@ -72,10 +74,13 @@ class BlogPostModel implements Persistable
         /** @var UTCDateTime $createdAt */
         $createdAt = $data['createdAt'];
 
+        foreach ($data['content'] as $contentItem) {
+            $this->addContentItem($contentItem);
+        }
+
         $this->setId($oid->__toString());
         $this->setSlug($data['slug']);
         $this->setTitle($data['title']);
-        $this->setContent($data['content']);
         $this->setCreatedAt($createdAt->toDateTime());
     }
 
@@ -128,7 +133,7 @@ class BlogPostModel implements Persistable
     }
 
     /**
-     * @return BlogContentModel[]
+     * @return BlogTextModel[]
      */
     public function getContent()
     {
@@ -136,11 +141,19 @@ class BlogPostModel implements Persistable
     }
 
     /**
-     * @param BlogContentModel[] $content
+     * @param BlogTextModel[] $content
      */
-    public function setContent(array $content = null)
+    public function setContent($content)
     {
         $this->content = $content;
+    }
+
+    /**
+     * @param BlogContentInterface $contentItem
+     */
+    public function addContentItem(BlogContentInterface $contentItem)
+    {
+        $this->content[] = $contentItem;
     }
 
     /**

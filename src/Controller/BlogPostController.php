@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Model\BlogPostModel;
+use App\Model\BlogTextModel;
 use App\Service\MongoService;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,19 +41,15 @@ class BlogPostController extends Controller implements PublicApiInterface
     }
 
     /**
-     * @Route("/post/{id}", methods={"GET"}, name="read_blog_post")
+     * @Route("/post/{slug}", methods={"GET"}, name="read_blog_post")
      *
-     * @param $id
+     * @param $slug
      *
      * @return Response
      */
-    public function getBlogPostAction($id)
+    public function getBlogPostAction($slug)
     {
-        $blogPost = new BlogPostModel();
-        $blogPost->setId($id);
-        $blogPost->setSlug('slug');
-        $blogPost->setTitle('title');
-
+        $blogPost = $this->service->findBlogPostBySlug($slug);
         $errors = $this->validator->validate($blogPost);
 
         if (count($errors) > 0) {
@@ -77,6 +74,8 @@ class BlogPostController extends Controller implements PublicApiInterface
         $content = $request->getContent();
         /** @var BlogPostModel $blogPost */
         $blogPost = $this->serializer->deserialize($content, BlogPostModel::class, 'json');
+        //var_dump($blogPost);
+        exit;
         $errors = $this->validator->validate($blogPost);
 
         if (count($errors) > 0) {

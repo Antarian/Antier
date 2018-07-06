@@ -11,7 +11,7 @@ lexik_jwt_authentication:
         # token encoder/decoder service - default implementation based on the lcobucci/jwt library
         service: lexik_jwt_authentication.encoder.lcobucci
         # encryption algorithm used by the encoder service
-        signature_algorithm: RS512
+        signature_algorithm: RS256
 
     # token extraction settings
     token_extractors:

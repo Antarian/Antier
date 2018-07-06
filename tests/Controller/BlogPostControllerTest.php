@@ -34,11 +34,17 @@ class BlogPostControllerTest extends ApiTestCase
                 'input' => json_encode([
                     'slug' => 'abc123',
                     'title' => 'Abc 123',
+                    'content' => [
+                        [
+                            'type' => 'text',
+                            'text' => 'blah blah',
+                        ],
+                    ],
                 ]),
                 'expected' => [
                     'slug' => 'abc123',
                     'title' => 'Abc 123',
-                    'content' => null
+                    'content' => []
                 ],
             ],
         ];
