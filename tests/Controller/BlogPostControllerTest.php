@@ -34,17 +34,21 @@ class BlogPostControllerTest extends ApiTestCase
                 'input' => json_encode([
                     'slug' => 'abc123',
                     'title' => 'Abc 123',
-                    'content' => [
+                    'contents' => [
                         [
                             'type' => 'text',
                             'text' => 'blah blah',
+                        ],
+                        [
+                            'type' => 'code',
+                            'code' => 'blah blah',
                         ],
                     ],
                 ]),
                 'expected' => [
                     'slug' => 'abc123',
                     'title' => 'Abc 123',
-                    'content' => []
+                    'contents' => []
                 ],
             ],
         ];
@@ -62,8 +66,8 @@ class BlogPostControllerTest extends ApiTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
         $jsonArr = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals($input, $jsonArr['id']);
-        $this->assertArrayHasKey('slug', $jsonArr);
+        $this->assertEquals($input, $jsonArr['slug']);
+        $this->assertArrayHasKey('id', $jsonArr);
         $this->assertArrayHasKey('title', $jsonArr);
     }
 
@@ -72,11 +76,9 @@ class BlogPostControllerTest extends ApiTestCase
      */
     public function dataGetBlogPostAction()
     {
-        $uuid = Uuid::uuid4();
-
         return [
             'correctGet' => [
-                'input' => $uuid->toString(),
+                'input' => 'abc123',
             ],
         ];
     }

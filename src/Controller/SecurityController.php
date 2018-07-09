@@ -28,7 +28,7 @@ class SecurityController extends Controller
     protected $serializer;
 
     /** @var MongoService */
-    protected $service;
+    protected $dataService;
 
     /** @var UserPasswordEncoderInterface */
     protected $passwordEncoder;
@@ -41,14 +41,14 @@ class SecurityController extends Controller
      *
      * @param ValidatorInterface $validator
      * @param SerializerInterface $serializer
-     * @param MongoService $service
+     * @param MongoService $dataService
      * @param UserPasswordEncoderInterface $passwordEncoder\
      */
-    public function __construct(ValidatorInterface $validator, SerializerInterface $serializer, MongoService $service, UserPasswordEncoderInterface $passwordEncoder, JWTEncoderInterface $tokenEncoder)
+    public function __construct(ValidatorInterface $validator, SerializerInterface $serializer, MongoService $dataService, UserPasswordEncoderInterface $passwordEncoder, JWTEncoderInterface $tokenEncoder)
     {
         $this->validator = $validator;
         $this->serializer = $serializer;
-        $this->service = $service;
+        $this->dataService = $dataService;
         $this->passwordEncoder = $passwordEncoder;
         $this->tokenEncoder = $tokenEncoder;
     }
@@ -77,8 +77,8 @@ class SecurityController extends Controller
         $password = $this->passwordEncoder->encodePassword($user, $user->getPassword());
         $user->setPassword($password);
 
-        $oid = $this->service->insertUser($user);
-        $userObj = $this->service->findUserByUsername($user->getUsername());
+        $oid = $this->dataService->insertUser($user);
+        $userObj = $this->dataService->findUserByUsername($user->getUsername());
 
         $userJson = $this->serializer->serialize($userObj, 'json', ['groups' => ['public']]);
         return new Response($userJson);
@@ -109,7 +109,7 @@ class SecurityController extends Controller
         // check password
         $user->eraseCredentials();
 
-        $user = $this->service->findUserByUsername($user->getUsername());
+        $user = $this->dataService->findUserByUsername($user->getUsername());
         $token = $this->tokenEncoder->encode($user);
         $tokenJson = json_encode(['token' => $token]);
 

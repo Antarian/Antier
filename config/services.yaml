@@ -34,15 +34,6 @@ services:
         arguments:
             $headers: '%headers%'
 
-    Symfony\Component\Serializer\Serializer:
-        arguments:
-            $normalizers:
-#                - Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer
-                - Symfony\Component\Serializer\Normalizer\ObjectNormalizer
-                - Symfony\Component\Serializer\Normalizer\ArrayDenormalizer
-            $encoders:
-                - Symfony\Component\Serializer\Encoder\JsonEncoder
-
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
     sensio_framework_extra.view.listener:

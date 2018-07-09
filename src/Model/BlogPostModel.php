@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class BlogPostModel implements Persistable
 {
     /**
-     * @var string
+     * @var string|null
      *
      * @Assert\Type(type="string")
      */
@@ -34,39 +34,45 @@ class BlogPostModel implements Persistable
     protected $title;
 
     /**
-     * @var BlogTextModel[]
+     * @var BlogContentInterface[]
      *
      * @Assert\Valid()
      */
-    protected $content;
+    protected $contents = [];
 
     /**
      * @var DateTime
      *
-     * @Assert\Type(type="\DateTime")
+     * @Assert\Type(type="DateTime")
      */
     protected $createdAt;
 
+    /**
+     * BlogPostModel constructor.
+     */
     public function __construct()
     {
-        //$this->content = [];
-        $this->setCreatedAt(new DateTime());
+        $this->setCreatedAt($this->getDateTime());
     }
 
-
-    public function bsonSerialize()
+    /**
+     * @return array
+     */
+    public function bsonSerialize(): array
     {
         return [
             '_id' => new ObjectId($this->getId()),
             'slug' => $this->getSlug(),
             'title' => $this->getTitle(),
-            'content' => $this->getContent(),
+            'contents' => $this->getContents(),
             'createdAt' => new UTCDateTime($this->getCreatedAt()),
         ];
     }
 
-
-    public function bsonUnserialize(array $data)
+    /**
+     * @param array $data
+     */
+    public function bsonUnserialize(array $data): void
     {
         /** @var ObjectId $oid */
         $oid = $data['_id'];
@@ -74,8 +80,8 @@ class BlogPostModel implements Persistable
         /** @var UTCDateTime $createdAt */
         $createdAt = $data['createdAt'];
 
-        foreach ($data['content'] as $contentItem) {
-            $this->addContentItem($contentItem);
+        foreach ($data['contents'] as $content) {
+            $this->addContent($content);
         }
 
         $this->setId($oid->__toString());
@@ -87,7 +93,7 @@ class BlogPostModel implements Persistable
     /**
      * @return string
      */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -95,7 +101,7 @@ class BlogPostModel implements Persistable
     /**
      * @param string $id
      */
-    public function setId(string $id)
+    public function setId(string $id): void
     {
         $this->id = $id;
     }
@@ -103,7 +109,7 @@ class BlogPostModel implements Persistable
     /**
      * @return string
      */
-    public function getSlug()
+    public function getSlug(): string
     {
         return $this->slug;
     }
@@ -111,7 +117,7 @@ class BlogPostModel implements Persistable
     /**
      * @param string $slug
      */
-    public function setSlug(string $slug)
+    public function setSlug(string $slug): void
     {
         $this->slug = $slug;
     }
@@ -119,7 +125,7 @@ class BlogPostModel implements Persistable
     /**
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -127,39 +133,50 @@ class BlogPostModel implements Persistable
     /**
      * @param string $title
      */
-    public function setTitle(string $title)
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
     /**
-     * @return BlogTextModel[]
+     * @return BlogContentInterface[]
      */
-    public function getContent()
+    public function getContents(): array
     {
-        return $this->content;
+        return $this->contents;
     }
 
     /**
-     * @param BlogTextModel[] $content
+     * @param BlogContentInterface[] $contents
      */
-    public function setContent($content)
+    public function setContents($contents): void
     {
-        $this->content = $content;
+        $this->contents = $contents;
     }
 
     /**
-     * @param BlogContentInterface $contentItem
+     * @param BlogContentInterface $content
      */
-    public function addContentItem(BlogContentInterface $contentItem)
+    public function addContent(BlogContentInterface $content): void
     {
-        $this->content[] = $contentItem;
+        $this->contents[] = $content;
+    }
+
+    /**
+     * @param BlogContentInterface $content
+     */
+    public function removeContent(BlogContentInterface $content): void
+    {
+        $index = array_search($content, $this->contents);
+        if ($index !== false) {
+            unset($this->contents[$index]);
+        }
     }
 
     /**
      * @return DateTime
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): DateTime
     {
         return $this->createdAt;
     }
@@ -167,12 +184,15 @@ class BlogPostModel implements Persistable
     /**
      * @param DateTime $createdAt
      */
-    public function setCreatedAt(DateTime $createdAt)
+    public function setCreatedAt(DateTime $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
 
-    protected function getDateTime()
+    /**
+     * @return DateTime
+     */
+    protected function getDateTime(): DateTime
     {
         return new DateTime();
     }

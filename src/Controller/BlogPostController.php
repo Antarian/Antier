@@ -2,7 +2,7 @@
 namespace App\Controller;
 
 use App\Model\BlogPostModel;
-use App\Model\BlogTextModel;
+use App\Model\BlogContentTextModel;
 use App\Service\MongoService;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +25,7 @@ class BlogPostController extends Controller implements PublicApiInterface
     /** @var SerializerInterface */
     protected $serializer;
 
-    protected $service;
+    protected $dataService;
 
     /**
      * BlogPostController constructor.
@@ -33,11 +33,11 @@ class BlogPostController extends Controller implements PublicApiInterface
      * @param ValidatorInterface $validator
      * @param SerializerInterface $serializer
      */
-    public function __construct(ValidatorInterface $validator, SerializerInterface $serializer, MongoService $service)
+    public function __construct(ValidatorInterface $validator, SerializerInterface $serializer, MongoService $dataService)
     {
         $this->validator = $validator;
         $this->serializer = $serializer;
-        $this->service = $service;
+        $this->dataService = $dataService;
     }
 
     /**
@@ -49,7 +49,7 @@ class BlogPostController extends Controller implements PublicApiInterface
      */
     public function getBlogPostAction($slug)
     {
-        $blogPost = $this->service->findBlogPostBySlug($slug);
+        $blogPost = $this->dataService->findBlogPostBySlug($slug);
         $errors = $this->validator->validate($blogPost);
 
         if (count($errors) > 0) {
@@ -73,9 +73,7 @@ class BlogPostController extends Controller implements PublicApiInterface
     {
         $content = $request->getContent();
         /** @var BlogPostModel $blogPost */
-        $blogPost = $this->serializer->deserialize($content, BlogPostModel::class, 'json');
-        //var_dump($blogPost);
-        exit;
+        $blogPost = $this->serializer->deserialize($content, BlogPostModel::class, 'json', ['allow_extra_attributes' => true]);
         $errors = $this->validator->validate($blogPost);
 
         if (count($errors) > 0) {
@@ -84,8 +82,8 @@ class BlogPostController extends Controller implements PublicApiInterface
             return new Response($errorsString);
         }
 
-        $oid = $this->service->insertBlogPost($blogPost);
-        $blogPostObj = $this->service->findBlogPostBySlug($blogPost->getSlug());
+        $oid = $this->dataService->insertBlogPost($blogPost);
+        $blogPostObj = $this->dataService->findBlogPostBySlug($blogPost->getSlug());
 
         $blogPostJson = $this->serializer->serialize($blogPostObj, 'json');
         return new Response($blogPostJson);

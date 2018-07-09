@@ -2,17 +2,23 @@
 namespace App\Model;
 
 use MongoDB\BSON\Persistable;
-use stdClass;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class BlogTextModel implements Persistable, BlogContentInterface
+/**
+ * Class BlogContentTextModel
+ *
+ * nested object for BlogPostModel class containing HTML text
+ *
+ * @package App\Model
+ */
+class BlogContentTextModel implements Persistable, BlogContentInterface
 {
     /**
      * @var string
      *
      * @Assert\Type(type="string")
      */
-    protected $type;
+    protected $type = 'text';
 
     /**
      * @var string
@@ -21,13 +27,10 @@ class BlogTextModel implements Persistable, BlogContentInterface
      */
     protected $text;
 
-    public function __construct(stdClass $data)
-    {
-        $this->type = 'text';
-        $this->setText($data->text);
-    }
-
-    public function bsonSerialize()
+    /**
+     * @return array
+     */
+    public function bsonSerialize(): array
     {
         return [
             'type' => $this->getType(),
@@ -35,8 +38,10 @@ class BlogTextModel implements Persistable, BlogContentInterface
         ];
     }
 
-
-    public function bsonUnserialize(array $data)
+    /**
+     * @param array $data
+     */
+    public function bsonUnserialize(array $data): void
     {
         $this->setText($data['text']);
     }
@@ -60,7 +65,7 @@ class BlogTextModel implements Persistable, BlogContentInterface
     /**
      * @param string $text
      */
-    public function setText(string $text)
+    public function setText(string $text): void
     {
         $this->text = $text;
     }

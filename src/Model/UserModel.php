@@ -8,16 +8,22 @@ use MongoDB\BSON\UTCDateTime;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class UserModel implements Persistable, UserInterface, EquatableInterface
 {
     /**
      * @var string|null
+     *
+     * @Assert\Type(type="string")
      */
     protected $id;
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank()
+     * @Assert\Type(type="string")
      *
      * @Groups({"public"})
      */
@@ -26,32 +32,50 @@ class UserModel implements Persistable, UserInterface, EquatableInterface
     /**
      * @var string
      *
+     * @Assert\NotBlank()
+     * @Assert\Type(type="string")
+     *
      * @Groups({"public"})
      */
     protected $email;
 
     /**
      * @var string|null
+     *
+     * @Assert\Type(type="string")
      */
     protected $password;
 
     /**
      * @var array
      *
+     * @Assert\All({
+     *     @Assert\NotBlank(),
+     *     @Assert\Type(type="string")
+     * })
+     *
      * @Groups({"public"})
      */
-    protected $roles;
+    protected $roles = [];
 
     /**
      * @var DateTime
+     *
+     * @Assert\Type(type="DateTime")
      */
     protected $createdAt;
 
+    /**
+     * UserModel constructor.
+     */
     public function __construct()
     {
-        $this->setCreatedAt(new DateTime());
+        $this->setCreatedAt($this->getDateTime());
     }
 
+    /**
+     * @return array
+     */
     public function bsonSerialize(): array
     {
         return [
@@ -63,6 +87,9 @@ class UserModel implements Persistable, UserInterface, EquatableInterface
         ];
     }
 
+    /**
+     * @param array $data
+     */
     public function bsonUnserialize(array $data)
     {
         /** @var ObjectId $oid */
@@ -78,24 +105,35 @@ class UserModel implements Persistable, UserInterface, EquatableInterface
         $this->setCreatedAt($createdAt->toDateTime());
     }
 
+    /**
+     * @return array
+     */
     public function getRoles(): array
     {
         return ['ROLE_ADMIN'];
     }
 
+    /**
+     * @return null|string
+     */
     public function getSalt()
     {
         return null;
     }
 
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
         if ($this->getPassword()) {
             $this->setPassword(null);
         }
     }
 
-    public function isEqualTo(UserInterface $user)
+    /**
+     * @param UserInterface $user
+     *
+     * @return bool
+     */
+    public function isEqualTo(UserInterface $user): bool
     {
         if (
             !$user instanceof UserModel ||
@@ -119,7 +157,7 @@ class UserModel implements Persistable, UserInterface, EquatableInterface
     /**
      * @param string|null $id
      */
-    public function setId(string $id = null)
+    public function setId(string $id = null): void
     {
         $this->id = $id;
     }
@@ -135,7 +173,7 @@ class UserModel implements Persistable, UserInterface, EquatableInterface
     /**
      * @param string $username
      */
-    public function setUsername(string $username)
+    public function setUsername(string $username): void
     {
         $this->username = $username;
     }
@@ -151,7 +189,7 @@ class UserModel implements Persistable, UserInterface, EquatableInterface
     /**
      * @param string $email
      */
-    public function setEmail(string $email)
+    public function setEmail(string $email): void
     {
         $this->email = $email;
     }
@@ -167,7 +205,7 @@ class UserModel implements Persistable, UserInterface, EquatableInterface
     /**
      * @param string|null $password
      */
-    public function setPassword(string $password = null)
+    public function setPassword(string $password = null): void
     {
         $this->password = $password;
     }
@@ -186,5 +224,13 @@ class UserModel implements Persistable, UserInterface, EquatableInterface
     public function setCreatedAt(DateTime $createdAt)
     {
         $this->createdAt = $createdAt;
+    }
+
+    /**
+     * @return DateTime
+     */
+    protected function getDateTime(): DateTime
+    {
+        return new DateTime();
     }
 }
